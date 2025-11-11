@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+.venv/
+venv/
+*.pyc
+
+# Checkpoints & artifacts
+checkpoints/*
+!checkpoints/.gitkeep
+
+# Large exports
+*.onnx
+*.pt
+*.pth
+
+# OS junk
+.DS_Store
+Thumbs.db
+
