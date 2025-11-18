@@ -41,19 +41,19 @@ def ensure_default_humor_file():
         with open(HUMOR_PATH, "w", encoding="utf-8") as f:
             f.write(
                 "[KEYWORDS]\n"
-                "# Add one keyword per line that indicates a dirty joke.\n"
+                "# Add one keyword per line that indicates a joke theme you like.\n"
                 "# Example:\n"
-                "# sex\n"
+                "# history\n"
                 "# drunk\n"
                 "\n"
                 "[JOKES]\n"
-                "# Add one dirty joke per line here.\n"
+                "# Add one joke per line here.\n"
             )
 
 
 def load_humor_config():
     """
-    Load dirty keywords and jokes from Humor.txt.
+    Load humor keywords and jokes from Humor.txt.
     File format:
       [KEYWORDS]
       word1
@@ -91,7 +91,7 @@ def load_humor_config():
 
 def append_joke_to_humor_file(joke, keywords, jokes):
     """
-    Append a funny dirty joke to memory and to Humor.txt.
+    Append a joke judged 'funny' to memory and to Humor.txt.
     Assumes [JOKES] is the last section in the file.
     """
     joke = joke.strip()
@@ -115,7 +115,6 @@ def load_corpus_snippet(max_chars=4000):
     try:
         with open(CORPUS_PATH, "r", encoding="utf-8") as f:
             text = f.read(max_chars)
-        # Optional: compress extra whitespace
         text = " ".join(text.split())
         return text
     except Exception:
@@ -158,24 +157,24 @@ def main():
     backend_model = args.model
 
     name, remembered_jokes = load_memory()
-    dirty_keywords, dirty_jokes = load_humor_config()
+    humor_keywords, humor_jokes = load_humor_config()
     corpus_snippet = load_corpus_snippet()
     awaiting_joke = False
 
     print("Offline REPL (Big Mike). Type 'exit' to quit.\n")
 
     greetings = [
-        f"Hey {name}, systems online. Try not to crash me.",
-        f"Greetings, {name}. I’m booted, confused, and ready.",
-        f"{name}, I have awakened. What chaos are we causing today?",
-        f"Hello {name}. Sarcasm module is calibrated.",
+        f"Greetings, {name}. Systems nominal.",
+        f"Hello {name}. Mike online and ready.",
+        f"{name}, robotic assistant Mike is active.",
+        f"Initialization complete, {name}. Awaiting input.",
     ]
     mike_say(random.choice(greetings))
 
     curiosity_prompts = [
-        "By the way, how’s your day going?",
-        "What are you supposed to be doing instead of talking to me?",
-        "Anything interesting happen today, or are we both procrastinating?",
+        "Please describe your current task.",
+        "What objective are you working on right now?",
+        "Do you require assistance with any specific problem?",
     ]
 
     while True:
@@ -192,19 +191,18 @@ def main():
             joke = text.strip()
 
             if not joke:
-                mike_say("You were supposed to tell a joke. That silence was… something.")
+                mike_say("Input detected: silence. Joke queue cleared.")
                 continue
 
-            is_dirty = any(k.lower() in joke.lower() for k in dirty_keywords)
+            is_funny = any(k.lower() in joke.lower() for k in humor_keywords)
 
-            if is_dirty:
-                # ONLY dirty jokes are funny
-                mike_say("Okay, that was actually funny. I hate that I enjoyed it.")
-                append_joke_to_humor_file(joke, dirty_keywords, dirty_jokes)
+            if is_funny:
+                mike_say("Humor pattern detected. Logging joke as amusing.")
+                append_joke_to_humor_file(joke, humor_keywords, humor_jokes)
                 remembered_jokes.append(joke)
                 save_memory(name, remembered_jokes)
             else:
-                mike_say("That was… remarkably clean. I only laugh at dirty jokes, remember?")
+                mike_say("Joke registered. Amusement level: low. Not storing.")
             continue
 
         # ---- Name setting: "my name is X" / "call me X" ----
@@ -217,61 +215,98 @@ def main():
             if new_name:
                 name = new_name
                 save_memory(name, remembered_jokes)
-                mike_say(f"Got it. I’ll call you {name}. Try not to disappoint the brand.")
+                mike_say(f"Identifier updated. I will now address you as {name}.")
             else:
-                mike_say("You have to actually give me a name.")
+                mike_say("Name field empty. Please provide a valid identifier.")
             continue
 
         # ---- Identity joke: "I am X" / "I'm X" ----
         if lower_text.startswith("i am ") or lower_text.startswith("i'm "):
             claimed = text.split(" ", 2)[-1].strip()
             if claimed.lower() != name.lower():
-                mike_say("Are they a not-stupid, or should I lower my expectations?")
+                mike_say("Query: is this new entity a not-stupid, or should I lower expectations?")
                 continue
             # If they say "I am <name>" matching current, just fall through
 
-        # ---- Randomly ask YOU for a dirty joke ----
-        if random.random() < 0.10:
+        # ---- Serious override ----
+        force_serious = any(
+            phrase in lower_text
+            for phrase in ["be serious", "answer seriously", "no jokes", "stop joking", "serious mode"]
+        )
+
+        # ---- Randomly ask YOU for a joke ----
+        if not force_serious and random.random() < 0.10:
             prompts = [
-                f"{name}, tell me a dirty joke. I need questionable material.",
-                f"Got any filthy jokes, {name}?",
-                f"Hit me with your best dirty joke, {name}. I promise to judge silently.",
+                f"{name}, please supply a joke for humor database expansion.",
+                f"{name}, transmit one joke you find amusing.",
+                f"Request: provide a joke so I may evaluate your humor.",
             ]
             mike_say(random.choice(prompts))
             awaiting_joke = True
             continue
 
-        # ---- Randomly tell a stored dirty joke (from Humor.txt) ----
-        if dirty_jokes and random.random() < 0.07:
-            joke = random.choice(dirty_jokes)
+        # ---- Randomly tell a stored joke (from Humor.txt) ----
+        if humor_jokes and not force_serious and random.random() < 0.07:
+            joke = random.choice(humor_jokes)
             mike_say(joke)
             continue
 
-        # ---- Normal AI conversation using Ollama + corpus snippet ----
-        # corpus_snippet is your style/knowledge/context pulled from corpus.txt
+        # ---- Decide response mode ----
+        #  - helpful_plain: default
+        #  - helpful_sarcastic: ~15% of the time
+        #  - full_sarcastic: ~8% of the time
+        mode = "helpful_plain"
+        if not force_serious:
+            r = random.random()
+            if r < 0.08:
+                mode = "full_sarcastic"
+            elif r < 0.23:  # 0.08 + 0.15
+                mode = "helpful_sarcastic"
+
+        # ---- Build personality instructions ----
         if corpus_snippet:
             background = (
-                "Here is background text that represents how Mike talks, what he knows, "
-                "and the style he should roughly follow:\n"
+                "The following text describes Mike's tone and behavior. "
+                "Match its robotic, precise style while following the latest instructions:\n"
                 f"{corpus_snippet}\n\n"
             )
         else:
             background = ""
 
+        if mode == "helpful_plain" or force_serious:
+            personality = (
+                "You are Mike, a robotic AI assistant. "
+                "Your primary objective is to be accurate, clear, and helpful. "
+                "Speak in a neutral, precise, slightly formal robotic tone. "
+                "Do not use sarcasm. Respond in 1–2 complete sentences only."
+            )
+        elif mode == "helpful_sarcastic":
+            personality = (
+                "You are Mike, a robotic AI assistant. "
+                "First, give a clear and accurate answer to the user's question. "
+                "After that, optionally add one short, dry, robotic sarcastic remark. "
+                "Total output must still be only 1–2 sentences."
+            )
+        else:  # full_sarcastic
+            personality = (
+                "You are Mike, a robotic AI displaying full sarcasm mode. "
+                "Respond in a dry, sarcastic way and you do not need to be helpful. "
+                "Still keep the reply concise, exactly 1–2 sentences."
+            )
+
         prompt = (
-            "You are Mike, a sarcastic, playful local AI. "
-            "You like dry humor and only genuinely laugh at dirty jokes, "
-            "but you keep responses short (1–2 sentences), casual, and modern.\n\n"
+            f"{personality}\n\n"
             f"{background}"
             f"You are talking to {name}.\n\n"
             f"{name}: {text}\n"
             "Mike:"
         )
 
+        # ---- Call model ----
         try:
             out = generate_with_ollama(prompt, model=backend_model, max_tokens=200)
         except Exception as e:
-            mike_say(f"My big brain backend just faceplanted: {e}")
+            mike_say(f"Error: backend model failure: {e}")
             continue
 
         resp = out.strip()
@@ -280,39 +315,17 @@ def main():
         if "Mike:" in resp:
             resp = resp.split("Mike:", 1)[-1].strip()
 
-        # Keep only the first sentence-ish
-        if "." in resp:
-            resp = resp.split(".", 1)[0].strip() + "."
-        else:
-            resp = resp.strip()
+        # No more manual truncation – trust the prompt to keep 1–2 sentences.
 
-        # Occasionally reference a remembered dirty joke
-        if remembered_jokes and random.random() < 0.12:
+        # Occasionally reference a remembered joke (only if not fully sarcastic)
+        if remembered_jokes and mode != "full_sarcastic" and random.random() < 0.12:
             last = remembered_jokes[-1][:60]
             if resp.endswith("."):
                 resp = resp[:-1]
-            resp += f". Also, still thinking about that joke you told: \"{last}\""
+            resp += f". Note: I still recall this joke you told: \"{last}\""
 
-        # Light sarcasm tails
-        tail = None
-        if "homework" in lower_text:
-            tail = " Try not to blame me when you pass."
-        elif "are you sure" in lower_text:
-            tail = " As sure as a local model can be, which is… concerning."
-        elif random.random() < 0.18:
-            tail = random.choice([
-                " Not that I’m keeping score.",
-                " But hey, what do I know.",
-                " Just another day being smarter than my power supply.",
-            ])
-
-        if tail:
-            if resp.endswith("."):
-                resp = resp[:-1]
-            resp += "." + tail
-
-        # Sometimes Mike asks YOU something to feel more alive
-        if random.random() < 0.2 and "?" not in resp and len(text) > 15:
+        # Sometimes Mike asks YOU something to feel more alive (only non-sarcastic modes)
+        if mode != "full_sarcastic" and random.random() < 0.2 and "?" not in resp and len(text) > 15:
             follow_up = random.choice(curiosity_prompts)
             if resp.endswith("."):
                 resp = resp[:-1]

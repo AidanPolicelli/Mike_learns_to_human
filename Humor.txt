@@ -9,5 +9,5 @@ tequila
 
 [JOKES]
 # Add one dirty joke per line here.
-This is a sample dirty joke that matches at least one keyword.
+I only get drunk when I wake up.
 
