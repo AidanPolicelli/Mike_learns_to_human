@@ -167,9 +167,9 @@ def main():
     # Training setup
     # --------------------------------------
     gen = batchify(ids, args.batch_size, args.seq_len, device)
-
+    optimizer = optim.AdamW(model.parameters(), lr=args.lr)
     # Make sure we do enough optimization steps even with a small corpus
-    min_steps = 200        # you can bump this to 300–500 later if you want
+    min_steps = 50        # you can bump this to 300–500 later if you want
     auto_steps = len(ids) // (args.batch_size * args.seq_len)
     steps_per_epoch = max(min_steps, auto_steps)
 
