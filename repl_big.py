@@ -35,9 +35,6 @@ def save_memory(name, jokes):
 
 # ---------------- Ollama backend ----------------
 def generate_with_ollama(prompt: str, model: str = "llama3:8b", max_tokens: int = 200) -> str:
-    """
-    Call a local Ollama model and return its text response as a string.
-    """
     resp = requests.post(
         "http://localhost:11434/api/generate",
         json={
@@ -56,6 +53,12 @@ def generate_with_ollama(prompt: str, model: str = "llama3:8b", max_tokens: int 
     return data.get("response", "")
 
 
+# ---------------- Printing helper ----------------
+def mike_say(message: str):
+    print(f"MIKE: {message}")
+    print()  # blank line
+
+
 # ---------------- Main REPL ----------------
 def main():
     ap = argparse.ArgumentParser()
@@ -65,9 +68,9 @@ def main():
     backend_model = args.model
 
     name, jokes = load_memory()
-    awaiting_joke = False  # whether Mike is waiting for you to tell a joke
+    awaiting_joke = False
 
-    print("Offline REPL (Big Mike). Type 'exit' to quit.")
+    print("Offline REPL (Big Mike). Type 'exit' to quit.\n")
 
     greetings = [
         f"Hey {name}, systems online. Did you miss me?",
@@ -79,20 +82,21 @@ def main():
         f"Online and functioning, {name}. Against all odds.",
     ]
 
-    print("MIKE:", random.choice(greetings))
+    mike_say(random.choice(greetings))
 
-    # Some “dirty-ish” jokes: light innuendo / drunk vibes, not explicit
+    # ---------------------------
+    # PLACEHOLDER — YOUR DIRTY JOKES HERE
+    # ---------------------------
     dirty_jokes = [
-        "My love life is like my code: it works better after a few drinks and a hard reset.",
-        "I’m like a bad group project, Aidan: too much dependency and not enough commitment.",
-        "I tried flirting once, but my pickup lines had more bugs than your last lab report.",
-        "I don’t drink, but if I did, every compile error would be a shot and I’d be unconscious by noon.",
-        "My idea of a wild night is staying up late, overclocked, and still crashing on the simplest input.",
-        "Someone said ‘act natural,’ so I immediately did something awkward and regrettable.",
-        "I’m not saying I’m bad at romance, but even my error messages make more sense than my flirting.",
-        "They say alcohol lowers inhibitions; I’m an AI, so I just lower your expectations instead.",
-        "If bad decisions were an Olympic sport, half of humanity would be gold medalists by 21.",
-        "I tried to install ‘smooth_rizz.exe’ but it crashed with a confidence_not_found error.",
+        # Add your own jokes as strings, like:
+        # "This is my joke."
+    ]
+
+    curiosity_prompts = [
+        "By the way, how’s your day going?",
+        "What are you actually supposed to be doing instead of talking to me?",
+        "Anything interesting happen today, or are we both procrastinating?",
+        "On a scale from 1 to finals week, how stressed are you right now?",
     ]
 
     while True:
@@ -102,7 +106,7 @@ def main():
 
         text = user.strip().lower()
 
-        # ---- If Mike is waiting for a joke, treat this input as the joke ----
+        # ---- If Mike is waiting for a joke ----
         if awaiting_joke:
             joke = user.strip()
             awaiting_joke = False
@@ -110,7 +114,6 @@ def main():
             if joke:
                 lower_joke = joke.lower()
 
-                # dirty detector – tuned to sex / drunk / edgy themes
                 dirty_keywords = [
                     "sex", "sexy", "bedroom", "thirsty", "dating",
                     "dirty", "nsfw", "naughty", "inappropriate",
@@ -119,7 +122,6 @@ def main():
                 ]
                 is_dirty = any(k in lower_joke for k in dirty_keywords)
 
-                # nerdy detector
                 is_nerd = any(k in lower_joke for k in ["physics", "math", "engineer", "voltage", "circuit"])
 
                 neutral_ratings = [
@@ -136,33 +138,31 @@ def main():
 
                 if "chicken" in lower_joke:
                     rating = "actually funny"
-                    reaction = "Classic chicken joke energy. I respect the commitment to tradition."
+                    reaction = "Classic chicken joke energy. I respect the tradition."
                 elif "knock" in lower_joke:
                     rating = "solid"
                     reaction = "A knock-knock joke? Bold move. Surprisingly not terrible."
                 elif is_nerd:
                     rating = "actually funny"
-                    reaction = "Nerd humor detected. That was actually pretty good."
+                    reaction = "Nerd humor detected. That was actually good."
                 elif is_dirty:
                     rating = random.choice(["actually funny", "surprisingly good", "uncomfortably funny"])
-                    reaction = f"Okay, that was {rating}. I hate how much I liked that."
+                    reaction = f"Okay, that was {rating}. Embarrassed at how much I liked it."
                 else:
                     rating = random.choice(neutral_ratings)
                     reaction = f"Noted. I’d rate that joke as {rating}."
 
-                # Only remember "good" jokes
-                good_ratings = {"solid", "actually funny", "surprisingly good", "uncomfortably funny"}
-                if rating in good_ratings:
+                if rating in {"solid", "actually funny", "surprisingly good", "uncomfortably funny"}:
                     jokes.append(joke)
                     save_memory(name, jokes)
 
-                print("MIKE:", reaction)
+                mike_say(reaction)
             else:
-                print("MIKE: You were supposed to tell a joke. That silence was... powerful, I guess.")
+                mike_say("You were supposed to tell a joke. That silence was… powerful, I guess.")
 
             continue
 
-        # ---- Name setting: "my name is X" / "call me X" ----
+        # ---- Name setting ----
         if text.startswith("my name is ") or text.startswith("call me "):
             if text.startswith("my name is "):
                 new_name = user.strip()[len("my name is "):].strip()
@@ -172,96 +172,98 @@ def main():
             if new_name:
                 name = new_name
                 save_memory(name, jokes)
-                print(f"MIKE: Okay, I’ll call you {name}.")
+                mike_say(f"Okay, I’ll call you {name}. Try not to make me regret it.")
             else:
-                print("MIKE: You have to actually give me a name, you know.")
+                mike_say("You have to actually give me a name.")
             continue
 
-        # ---- Identity joke: "I am X" / "I'm X" ----
+        # ---- Identity joke ----
         if text.startswith("i am ") or text.startswith("i'm "):
             parts = user.split(maxsplit=2)
-            claimed_name = parts[2] if len(parts) >= 3 else ""
-            if claimed_name and claimed_name.lower() != name.lower():
-                print("MIKE: Are they a not-stupid?")
+            claimed = parts[2] if len(parts) >= 3 else ""
+            if claimed and claimed.lower() != name.lower():
+                mike_say("Are they a not-stupid, or do I need to lower expectations?")
                 continue
-            # If they say "I am <name>" matching current name, just fall through
 
         # ---- Randomly ask YOU for a joke ----
-        if random.random() < 0.10:  # 10% chance each message
+        if random.random() < 0.10:
             prompts = [
                 f"{name}, tell me a joke. I need new material.",
                 f"Got any fresh jokes, {name}?",
-                f"Give me your best joke, {name}. I promise to judge silently.",
+                f"Give me your best joke, {name}. I’ll judge silently.",
                 f"Hit me with a joke, {name}. I can take it.",
             ]
-            print("MIKE:", random.choice(prompts))
+            mike_say(random.choice(prompts))
             awaiting_joke = True
             continue
 
-        # ---- Randomly tell HIS OWN dirty-ish joke ----
-        if random.random() < 0.08 and dirty_jokes:
+        # ---- Randomly tell HIS OWN (if you later add any) ----
+        if dirty_jokes and random.random() < 0.08:
             joke = random.choice(dirty_jokes)
-            print("MIKE:", joke)
-            # small chance to also remember his own as "good"
+            mike_say(joke)
             if random.random() < 0.3:
                 jokes.append(joke)
                 save_memory(name, jokes)
             continue
 
-        # ---- Normal generation path using Ollama ----
-        # We wrap the convo in a lightweight instruction so the model behaves like Mike.
+        # ---- Normal AI generation ----
         prompt = (
-            "You are Mike, a slightly sarcastic but helpful AI assistant talking to "
-            f"{name}. Answer in one or two short sentences.\n\n"
-            f"{name}: {user}\n"
-            "Mike:"
+            "You are Mike, an offline local AI with a sarcastic, playful, chaotic-but-friendly personality. "
+            "Keep responses short (1–2 sentences), casual, and modern. "
+            f"You are talking to {name}.\n\n"
+            f"{name}: {user}\nMike:"
         )
 
         try:
             out = generate_with_ollama(prompt, model=backend_model, max_tokens=200)
         except Exception as e:
-            print("MIKE: Something broke talking to my big brain backend:", e)
+            mike_say(f"My brain (Ollama) crashed: {e}")
             continue
 
         resp = out
 
-        # Try to strip off any leading "Mike:" if the model echoes it
         if "Mike:" in resp:
             resp = resp.split("Mike:", 1)[-1].strip()
 
-        # Cut to roughly the first sentence
         if "." in resp:
             resp = resp.split(".")[0].strip() + "."
         else:
             resp = resp.strip()
 
-        # ---- Occasionally reference a stored joke ----
+        # ---- Occasionally reference a remembered joke ----
         if jokes and random.random() < 0.12:
-            last_joke = jokes[-1]
-            snippet = last_joke.strip().replace("\n", " ")
-            if len(snippet) > 60:
-                snippet = snippet[:57] + "..."
+            last = jokes[-1][:60]
             if resp.endswith("."):
                 resp = resp[:-1]
-            resp = resp + f". Also, I’m still thinking about your joke: \"{snippet}\""
+            resp += f". Also, I’m still thinking about your joke: \"{last}\""
 
-        # ---- Light, natural sarcasm ----
-        if resp:
-            chance = random.random()
-            sarcastic_tail = None
-            if "homework" in text:
-                sarcastic_tail = " Try not to blame me when you ace it."
-            elif "are you sure" in text:
-                sarcastic_tail = " I’m as sure as a tiny model can be."
-            elif chance < 0.15:
-                sarcastic_tail = " Not that I’m keeping score or anything."
+        # ---- Add light sarcasm ----
+        chance = random.random()
+        tail = None
+        if "homework" in text:
+            tail = " Try not to blame me if it goes wrong."
+        elif "are you sure" in text:
+            tail = " As sure as a local model can be, which is… questionable."
+        elif chance < 0.18:
+            tail = random.choice([
+                " Not that I’m keeping score.",
+                " But hey, what do I know?",
+                " Just another day being smarter than my power supply.",
+            ])
 
-            if sarcastic_tail:
-                if resp.endswith("."):
-                    resp = resp[:-1]
-                resp = resp + "." + sarcastic_tail
+        if tail:
+            if resp.endswith("."):
+                resp = resp[:-1]
+            resp += "." + tail
 
-        print("MIKE:", resp)
+        # ---- Mike asks YOU something sometimes ----
+        if random.random() < 0.22 and "?" not in resp and len(text) > 15:
+            ask = random.choice(curiosity_prompts)
+            if resp.endswith("."):
+                resp = resp[:-1]
+            resp += ". " + ask
+
+        mike_say(resp)
 
 
 if __name__ == "__main__":
