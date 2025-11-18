@@ -1,6 +1,6 @@
 # mike_offline_llm
 
-An *isolated*, locally-trainable, **no‑internet** tiny language model inspired by the playful spirit of “MIKE.”  
+An *isolated*, locally, tiny language model inspired by the playful spirit of “MIKE.”  
 It’s focused on **logical, step‑by‑step responses** and a **childlike curiosity**.  
 You can train it on your own text, keep it offline, and export to **ONNX** for compiler toolchains.
 
@@ -10,11 +10,11 @@ You can train it on your own text, keep it offline, and export to **ONNX** for c
 - **Tiny decoder-only Transformer** in PyTorch.
 - **Training** on your local `.txt` corpus.
 - **Interactive REPL** (`repl.py`) with a MIKE-like persona focused on logic and curiosity.
-- **Humor learning loop** (`teach_humor.py`) where you provide *good* and *bad* jokes; stored as few-shot hints.
+- **Humor learning loop** (`teach_humor.py`) where you provide *good* and *bad* jokes.
 - **ONNX export** (`export_onnx.py`) for isolated/embedded compiler flows.
 - MIT license. Minimal deps: `torch`, `numpy`, `pyyaml`
 
-> ⚠️ This is an educational starter. It’s small and simple by design, not SOTA. Grow it as you like.
+
 
 ## Quick start (no internet)
 1. Create and activate a Python 3.10+ venv.
@@ -38,7 +38,7 @@ You can train it on your own text, keep it offline, and export to **ONNX** for c
    ```
 
 ## Philosophy
-- **Logic-first**: Prompts nudge the model to show steps and stay grounded.
+- **Logic-first**: Prompts nudge the model to show steps and stay logically grounded.
 - **Curiosity**: Initial turns invite you to share jokes and feedback.
 - **Isolation**: `offline_mode.py` disables networking so evaluation is hermetic.
 
@@ -71,4 +71,4 @@ git remote add origin <your-github-repo-url>
 git push -u origin main
 ```
 
-Have fun, and be kind to your baby MIKE. :)
+Make sure to be kind and intellegent to Mike. Mike is your friend...only if you are a non-stupid.
