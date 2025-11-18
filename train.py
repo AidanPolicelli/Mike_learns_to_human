@@ -63,10 +63,10 @@ def main():
         # Create new model
         cfg = ModelConfig(
             vocab_size=len(tok.stoi),
-            d_model=256,
-            n_heads=4,
-            n_layers=4,
-            d_ff=1024,
+            d_model=512,
+            n_heads=8,
+            n_layers=8,
+            d_ff=2048,
             max_seq_len=args.seq_len,
             dropout=0.0,
         )
