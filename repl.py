@@ -1,14 +1,39 @@
-import argparse, os, json, torch
+import argparse, os, json, torch, random
 from tokenizer import CharTokenizer
 from model import TinyTransformer, ModelConfig
 
-def load(model_path, vocab_path, device):
+MEMORY_PATH = "mike_memory.json"
+
+
+# ---------------- Memory helpers ----------------
+def load_memory():
+    if os.path.exists(MEMORY_PATH):
+        try:
+            with open(MEMORY_PATH, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            name = data.get("user_name", "Aidan")
+            return name
+        except Exception:
+            pass
+    # default if no memory / corrupted
+    return "Aidan"
+
+
+def save_memory(name):
+    data = {"user_name": name}
+    with open(MEMORY_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f)
+
+
+# ---------------- Model helpers ----------------
+def load_model(model_path, vocab_path, device):
     ckpt = torch.load(model_path, map_location=device)
     cfg = ModelConfig(**ckpt["cfg"])
     model = TinyTransformer(cfg).to(device)
     model.load_state_dict(ckpt["model"])
     tok = CharTokenizer.load(vocab_path)
     return model, tok
+
 
 def generate_text(model, tok, prompt, device, max_new_tokens=200, temperature=0.3, top_k=50):
     model.eval()
@@ -21,10 +46,12 @@ def generate_text(model, tok, prompt, device, max_new_tokens=200, temperature=0.
             x,
             max_new_tokens=max_new_tokens,
             temperature=temperature,
-            top_k=top_k
+            top_k=top_k,
         )
     return tok.decode(y[0].tolist())
 
+
+# ---------------- Main REPL ----------------
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True)
@@ -32,35 +59,80 @@ def main():
     args = ap.parse_args()
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    model, tok = load(args.model, args.vocab, device)
+    model, tok = load_model(args.model, args.vocab, device)
+
+    name = load_memory()
 
     print("Offline REPL. Type 'exit' to quit.")
-
-    NAME = "Aidan"
+    print(f"(Hello {name}. I’ll try to be helpful… and a little bit sarcastic.)")
 
     while True:
-        user = input(f"{NAME}: ")
+        user = input(f"{name}: ")
         if user.strip().lower() in {"exit", "quit"}:
             break
 
         text = user.strip().lower()
 
-        # Detect "I am X" or "I'm X"
+        # ---- Name setting: "my name is X" / "call me X" ----
+        if text.startswith("my name is ") or text.startswith("call me "):
+            if text.startswith("my name is "):
+                new_name = user.strip()[len("my name is "):].strip()
+            else:
+                new_name = user.strip()[len("call me "):].strip()
+
+            if new_name:
+                name = new_name
+                save_memory(name)
+                print(f"MIKE: Okay, I’ll call you {name}.")
+            else:
+                print("MIKE: You have to actually give me a name, you know.")
+            continue
+
+        # ---- Identity joke: "I am X" / "I'm X" ----
         if text.startswith("i am ") or text.startswith("i'm "):
             parts = user.split(maxsplit=2)
             claimed_name = parts[2] if len(parts) >= 3 else ""
-
-            if claimed_name and claimed_name.lower() != NAME.lower():
+            if claimed_name and claimed_name.lower() != name.lower():
                 print("MIKE: Are they a not-stupid?")
                 continue
+            # If they say "I am <name>" matching current name, just fall through
 
-        # Normal generation path
-        prompt = f"{NAME}: {user}\nAssistant:"
+        # ---- Normal generation path ----
+        prompt = f"{name}: {user}\nAssistant:"
         out = generate_text(model, tok, prompt, device, max_new_tokens=120)
 
-        # Extract assistant response
+        # Extract assistant response and cut to first sentence
         resp = out.split("Assistant:")[-1]
-        resp = resp.split(".")[0].strip() + "."
+        if "." in resp:
+            resp = resp.split(".")[0].strip() + "."
+        else:
+            resp = resp.strip()
+
+        # ---- Light, natural sarcasm layer ----
+        # Small chance to add a playful tail so it feels like a personality,
+        # not a hard mode toggle.
+        if resp:
+            chance = random.random()
+
+            # A few simple triggers: questions like "really", "sure", "serious"
+            lower_text = text
+            sarcastic_tail = None
+
+            if "homework" in lower_text or "study" in lower_text:
+                sarcastic_tail = " Try not to blame me when you ace it."
+            elif "really?" in lower_text or "really" == lower_text.strip("?"):
+                sarcastic_tail = " Yes, really. I’m not just making it up. Probably."
+            elif "are you sure" in lower_text:
+                sarcastic_tail = " I’m as sure as a tiny model can be."
+            elif chance < 0.18:
+                # random light sarcasm
+                sarcastic_tail = " Not that I’m keeping score or anything."
+
+            if sarcastic_tail:
+                # Make sure we don't double end with period
+                if resp.endswith("."):
+                    resp = resp[:-1]
+                resp = resp + "." + sarcastic_tail
 
         print("MIKE:", resp)
 
