@@ -36,13 +36,39 @@ def main():
     model, tok = load(args.model, args.vocab, device)
 
     print("Offline REPL. Type 'exit' to quit.")
+    
+    NAME = "Aidan"
+
     while True:
-        user = input("You: ")
+        user = input(f"{NAME}: ")
         if user.strip().lower() in {"exit", "quit"}:
             break
-        
-        # tiny char-model friendly prompt
-        prompt = f"User: {user}\nAssistant:"
+
+        text = user.strip().lower()
+
+        # Detect "I am X" or "I'm X"
+        if text.startswith("i am ") or text.startswith("i'm "):
+            # Extract the claimed name after "i am"/"i'm"
+            parts = user.split(maxsplit=2)
+            if len(parts) >= 3:
+                claimed_name = parts[2]
+            else:
+                claimed_name = ""
+
+            # If they claim to be someone other than Aidan, use the joke response
+            if claimed_name and claimed_name.lower() not in {NAME.lower()}:
+                print("MIKE: Are they a not-stupid?")
+                continue  # skip calling the model, we already answered
+            # If they say "I am Aidan", just fall through and treat it normally
+
+    # normal generation path
+    prompt = f"{NAME}: {user}\nAssistant:"
+    out = generate_text(model, tok, prompt, device, max_new_tokens=120)
+    resp = out.split("Assistant:")[-1]
+    resp = resp.split(".")[0].strip() + "."
+    print("MIKE:", resp)
+
+
         out = generate_text(model, tok, prompt, device, max_new_tokens= 100)
 
         # just take everything after Assistant:
