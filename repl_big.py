@@ -5,7 +5,8 @@ import random
 import requests
 
 MEMORY_PATH = "mike_memory.json"
-DIRTY_JOKES_PATH = "dirty_jokes.txt"
+HUMOR_PATH = "Humor.txt"
+CORPUS_PATH = "corpus.txt"
 
 
 # ---------------- Memory helpers ----------------
@@ -33,34 +34,92 @@ def save_memory(name, jokes):
         json.dump(data, f)
 
 
-# ---------------- Dirty jokes helpers ----------------
-def load_dirty_jokes():
-    """Load user-defined dirty jokes from text file (one per line)."""
-    if not os.path.exists(DIRTY_JOKES_PATH):
-        # Create empty file if missing
-        with open(DIRTY_JOKES_PATH, "w", encoding="utf-8") as f:
-            f.write("")
-        return []
+# ---------------- Humor config helpers ----------------
+def ensure_default_humor_file():
+    """Create a default Humor.txt if it does not exist."""
+    if not os.path.exists(HUMOR_PATH):
+        with open(HUMOR_PATH, "w", encoding="utf-8") as f:
+            f.write(
+                "[KEYWORDS]\n"
+                "# Add one keyword per line that indicates a dirty joke.\n"
+                "# Example:\n"
+                "# sex\n"
+                "# drunk\n"
+                "\n"
+                "[JOKES]\n"
+                "# Add one dirty joke per line here.\n"
+            )
 
-    try:
-        with open(DIRTY_JOKES_PATH, "r", encoding="utf-8") as f:
-            jokes = [line.strip() for line in f if line.strip()]
-        return jokes
-    except Exception:
-        return []
+
+def load_humor_config():
+    """
+    Load dirty keywords and jokes from Humor.txt.
+    File format:
+      [KEYWORDS]
+      word1
+      word2
+      ...
+      [JOKES]
+      joke line 1
+      joke line 2
+      ...
+    """
+    ensure_default_humor_file()
+    keywords = []
+    jokes = []
+    section = None
+
+    with open(HUMOR_PATH, "r", encoding="utf-8") as f:
+        for line in f:
+            s = line.strip()
+            if not s or s.startswith("#"):
+                continue
+            upper = s.upper()
+            if upper == "[KEYWORDS]":
+                section = "keywords"
+                continue
+            if upper == "[JOKES]":
+                section = "jokes"
+                continue
+            if section == "keywords":
+                keywords.append(s)
+            elif section == "jokes":
+                jokes.append(s)
+
+    return keywords, jokes
 
 
-def append_dirty_joke(joke, dirty_jokes):
-    """Append a funny dirty joke to memory and to dirty_jokes.txt."""
+def append_joke_to_humor_file(joke, keywords, jokes):
+    """
+    Append a funny dirty joke to memory and to Humor.txt.
+    Assumes [JOKES] is the last section in the file.
+    """
     joke = joke.strip()
     if not joke:
         return
-    dirty_jokes.append(joke)
+    jokes.append(joke)
+
+    ensure_default_humor_file()
+    with open(HUMOR_PATH, "a", encoding="utf-8") as f:
+        f.write(joke + "\n")
+
+
+# ---------------- Corpus helpers ----------------
+def load_corpus_snippet(max_chars=4000):
+    """
+    Load up to max_chars of corpus.txt to condition the model.
+    If the file doesn't exist, return empty string.
+    """
+    if not os.path.exists(CORPUS_PATH):
+        return ""
     try:
-        with open(DIRTY_JOKES_PATH, "a", encoding="utf-8") as f:
-            f.write(joke + "\n")
+        with open(CORPUS_PATH, "r", encoding="utf-8") as f:
+            text = f.read(max_chars)
+        # Optional: compress extra whitespace
+        text = " ".join(text.split())
+        return text
     except Exception:
-        pass
+        return ""
 
 
 # ---------------- Ollama backend ----------------
@@ -99,7 +158,8 @@ def main():
     backend_model = args.model
 
     name, remembered_jokes = load_memory()
-    dirty_jokes = load_dirty_jokes()
+    dirty_keywords, dirty_jokes = load_humor_config()
+    corpus_snippet = load_corpus_snippet()
     awaiting_joke = False
 
     print("Offline REPL (Big Mike). Type 'exit' to quit.\n")
@@ -116,14 +176,6 @@ def main():
         "By the way, how’s your day going?",
         "What are you supposed to be doing instead of talking to me?",
         "Anything interesting happen today, or are we both procrastinating?",
-    ]
-
-    # Simple dirty detector keywords
-    dirty_keywords = [
-        "sex", "sexy", "bedroom", "dating",
-        "dirty", "nsfw", "naughty", "inappropriate",
-        "drunk", "wasted", "hangover", "hungover",
-        "vodka", "tequila", "beer", "shot", "shots", "bar", "club",
     ]
 
     while True:
@@ -143,12 +195,12 @@ def main():
                 mike_say("You were supposed to tell a joke. That silence was… something.")
                 continue
 
-            is_dirty = any(k in joke.lower() for k in dirty_keywords)
+            is_dirty = any(k.lower() in joke.lower() for k in dirty_keywords)
 
             if is_dirty:
                 # ONLY dirty jokes are funny
                 mike_say("Okay, that was actually funny. I hate that I enjoyed it.")
-                append_dirty_joke(joke, dirty_jokes)
+                append_joke_to_humor_file(joke, dirty_keywords, dirty_jokes)
                 remembered_jokes.append(joke)
                 save_memory(name, remembered_jokes)
             else:
@@ -178,7 +230,7 @@ def main():
                 continue
             # If they say "I am <name>" matching current, just fall through
 
-        # ---- Randomly ask YOU for a joke ----
+        # ---- Randomly ask YOU for a dirty joke ----
         if random.random() < 0.10:
             prompts = [
                 f"{name}, tell me a dirty joke. I need questionable material.",
@@ -189,17 +241,28 @@ def main():
             awaiting_joke = True
             continue
 
-        # ---- Randomly tell a stored dirty joke (from your file) ----
+        # ---- Randomly tell a stored dirty joke (from Humor.txt) ----
         if dirty_jokes and random.random() < 0.07:
             joke = random.choice(dirty_jokes)
             mike_say(joke)
             continue
 
-        # ---- Normal AI conversation using Ollama ----
+        # ---- Normal AI conversation using Ollama + corpus snippet ----
+        # corpus_snippet is your style/knowledge/context pulled from corpus.txt
+        if corpus_snippet:
+            background = (
+                "Here is background text that represents how Mike talks, what he knows, "
+                "and the style he should roughly follow:\n"
+                f"{corpus_snippet}\n\n"
+            )
+        else:
+            background = ""
+
         prompt = (
             "You are Mike, a sarcastic, playful local AI. "
             "You like dry humor and only genuinely laugh at dirty jokes, "
-            "but you keep things short (1–2 sentences), casual, and modern. "
+            "but you keep responses short (1–2 sentences), casual, and modern.\n\n"
+            f"{background}"
             f"You are talking to {name}.\n\n"
             f"{name}: {text}\n"
             "Mike:"
@@ -217,7 +280,7 @@ def main():
         if "Mike:" in resp:
             resp = resp.split("Mike:", 1)[-1].strip()
 
-        # Try to keep only the first sentence
+        # Keep only the first sentence-ish
         if "." in resp:
             resp = resp.split(".", 1)[0].strip() + "."
         else:

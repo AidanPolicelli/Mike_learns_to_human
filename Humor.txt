@@ -1,0 +1,13 @@
+[KEYWORDS]
+# Add one keyword per line that indicates a dirty joke.
+# Example:
+sex
+drunk
+hangover
+vodka
+tequila
+
+[JOKES]
+# Add one dirty joke per line here.
+This is a sample dirty joke that matches at least one keyword.
+
