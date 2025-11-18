@@ -20,7 +20,7 @@ def load(model_path, vocab_path, device):
     tok = CharTokenizer.load(vocab_path)
     return model, tok
 
-def generate_text(model, tok, prompt, device, max_new_tokens=200, temperature=0.8, top_k=200):
+def generate_text(model, tok, prompt, device, max_new_tokens=200, temperature=0.7, top_k=200):
     model.eval()
     ids = tok.encode(prompt)
     if not ids: return ""
