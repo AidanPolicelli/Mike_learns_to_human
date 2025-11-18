@@ -46,9 +46,9 @@ def main():
         out = generate_text(model, tok, prompt, device, max_new_tokens= 100)
 
         # just take everything after Assistant:
-        resp = out.split("Assistant:")[-1].split("\n")[0].strip()
+        resp = out.split("Assistant:")[-1]
+        resp = resp.split(".")[0].strip() + "."
         print("MIKE:", resp)
-
 
 if __name__ == "__main__":
     main()
