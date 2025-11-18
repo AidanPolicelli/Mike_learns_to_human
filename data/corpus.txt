@@ -343,3 +343,223 @@ The speed of light is approximately 299,792 kilometers per second.
 The Moon affects tides due to its gravitational pull.
 Plants create energy through photosynthesis, using sunlight, water, and carbon dioxide.
 The human brain contains billions of neurons.
+
+SECTION 10 — ADVANCED WORLD HISTORY
+
+History is driven by causes and consequences.
+Every event is shaped by forces such as economics, culture, technology, competition, geography, and human ambition.
+
+The Rise and Fall of Empires
+
+Empires grow when leadership, resources, and military strength align.
+They decline when internal conflict, corruption, economic strain, or outside pressure increases.
+
+Examples:
+
+The Roman Empire expanded through engineering, administration, and military discipline. Its fall resulted from political instability, economic stress, and external invasions.
+
+The Ottoman Empire thrived on trade, cultural exchange, and strategic control of land routes between Europe and Asia. It declined after military stagnation, nationalism movements, and industrialization gaps.
+
+The Mongol Empire grew through mobility, adaptability, and strategic diplomacy. It fragmented when territories became too large to govern and leaders lacked unity.
+
+The Enlightenment
+
+The Enlightenment emphasized science, reason, human rights, and individual liberty.
+Thinkers such as John Locke, Voltaire, Rousseau, and Kant shaped political and philosophical ideas that influenced modern democracy.
+
+Industrial Revolution
+
+The Industrial Revolution transformed societies by introducing machines, factories, energy production, and mass manufacturing.
+It led to urbanization, social reform movements, global trade expansion, and technological acceleration.
+
+Modern Era
+
+The 20th century witnessed rapid global change:
+
+World Wars reshaped political boundaries.
+
+Decolonization movements freed nations from imperial rule.
+
+Space exploration expanded human knowledge.
+
+Computers and the internet launched a digital revolution.
+
+History continues to unfold through innovation, conflict, cooperation, and cultural evolution.
+
+SECTION 11 — ADVAN‌CED VOCABULARY
+
+abstraction — a simplified representation of a complex idea
+catalyst — something that accelerates change
+cohesive — forming a unified whole
+emergent — arising from smaller components interacting
+paradigm — a framework or model of understanding
+resilient — able to recover from difficulty
+synthesis — combining parts to form a new whole
+tenet — a core belief or principle
+iteration — repetition to improve an outcome
+transient — temporary or short-lived
+veracity — accuracy or truthfulness
+anomaly — something that deviates from the norm
+convergence — coming together or merging
+dichotomy — a division between two contrasting things
+
+SECTION 12 — EXPANDED SCIENCE EXPLANATIONS
+Physics
+
+Physics explores matter, energy, motion, and the laws that govern the universe.
+
+Newton’s Laws of Motion
+
+Objects maintain motion unless acted upon by an external force.
+
+Force equals mass times acceleration (F = ma).
+
+For every action there is an equal and opposite reaction.
+
+Thermodynamics
+Energy cannot be created or destroyed, only transformed.
+Heat flows from hot objects to cold ones until equilibrium is reached.
+
+Electricity and Magnetism
+Charged particles create electric fields.
+Moving charges create magnetic fields.
+Electromagnetic waves travel through space at the speed of light.
+
+Chemistry
+
+Matter is composed of atoms.
+Chemical reactions rearrange atoms into new combinations.
+Reactions are governed by principles of energy, entropy, and probability.
+
+Biology
+
+Living organisms evolve through natural selection.
+DNA carries genetic information.
+Cells form the basic structure of life.
+Ecosystems involve interactions among organisms and environments.
+
+SECTION 13 — MATHEMATICS: ALGEBRA, GEOMETRY, PROBABILITY
+Algebra
+
+Variables represent unknown values.
+Equations express relationships.
+
+Example:
+Solve 2x + 4 = 12
+Subtract 4: 2x = 8
+Divide by 2: x = 4
+
+Functions
+
+A function assigns each input exactly one output.
+Example: f(x) = x² means f(3) = 9.
+
+Geometry
+
+Triangles have interior angles that add to 180°.
+A circle has circumference C = 2πr and area A = πr².
+Right triangles follow the Pythagorean theorem: a² + b² = c².
+
+Basic Probability
+
+Probability measures the chance of an event occurring.
+
+Example:
+A fair six-sided die has outcomes {1, 2, 3, 4, 5, 6}.
+The probability of rolling a 4 is 1/6.
+
+Compound events depend on combinations of outcomes.
+
+Statistics
+
+Mean — average value
+Median — middle value
+Mode — most common value
+Variance — spread of data
+Standard deviation — typical distance from the mean
+
+SECTION 14 — CRITICAL THINKING AND REASONING
+
+Critical thinking examines information for clarity, accuracy, relevance, and logic.
+Good reasoning avoids assumptions without evidence.
+
+Key Techniques
+
+Ask precise questions.
+
+Identify biases.
+
+Distinguish facts from opinions.
+
+Look for contradictions.
+
+Evaluate sources of information.
+
+Consider alternative explanations.
+
+Example
+
+Claim: “All birds can fly.”
+Counterexample: Penguins cannot fly.
+Conclusion: The claim is false.
+
+Critical thinking strengthens decision making, analysis, and communication.
+
+SECTION 15 — GENERAL KNOWLEDGE ESSAYS
+The Nature of Innovation
+
+Innovation occurs when ideas meet necessity.
+Technological breakthroughs combine creativity, experimentation, and persistence.
+Progress builds on previous discoveries and expands through collaboration.
+
+Economics
+
+Economics studies how resources are produced, distributed, and consumed.
+Supply and demand determine prices.
+Markets respond to incentives, scarcity, and opportunity cost.
+
+Psychology
+
+Human behavior is shaped by biology, environment, cognition, and experience.
+Motivation drives actions.
+Emotion influences choices.
+Memory stores and retrieves information.
+
+SECTION 16 — ENGLISH WRITING SAMPLES (VERY IMPORTANT FOR LANGUAGE MODELS)
+
+Clear explanations often follow a structure.
+A good paragraph begins with a main idea, develops it with details, and concludes with insight.
+
+Example paragraph:
+Learning is a gradual process that builds on prior knowledge. Each new concept links to earlier understanding, forming a network of ideas. The more connections formed, the stronger the memory becomes. Effective learning strategies focus on comprehension, repetition, and thoughtful application.
+
+Another example:
+Technology evolves at an exponential rate, reshaping communication, transportation, medicine, and culture. Innovations once considered impossible become commonplace as knowledge expands. Adaptability and curiosity help individuals thrive in a rapidly changing world.
+
+SECTION 17 — DIALOGUE SAMPLES (HELPS TRAIN CONVERSATION)
+
+Person A: What is gravity?
+Person B: Gravity is the force that pulls objects toward each other. On Earth, it keeps everything anchored to the ground.
+
+Person A: How does electricity work?
+Person B: Electricity involves the movement of charged particles through a conductor. It powers devices by transferring energy.
+
+Person A: Why study history?
+Person B: History teaches how societies change, why conflicts arise, and how knowledge develops. It helps prevent past mistakes.
+
+Person A: What is a molecule?
+Person B: A molecule is a group of atoms bonded together. It is the smallest unit of a chemical compound.
+
+Person A: Can you explain probability?
+Person B: Probability measures the chance an event will occur. It ranges from 0 to 1, where 0 means impossible and 1 means certain.
+
+SECTION 18 — CLEAN, WELL-FORMED SENTENCES
+
+The wind carves patterns in sand dunes.
+The ocean reflects the color of the sky.
+Libraries preserve knowledge for future generations.
+Science expands through curiosity and disciplined methods.
+Mathematics reveals order in apparent chaos.
+A good teacher inspires questions, not just answers.
+Learning strengthens the mind like exercise strengthens the body.
+Truth is discovered through evidence, reasoning, and open inquiry.
