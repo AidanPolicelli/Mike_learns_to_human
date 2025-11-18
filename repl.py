@@ -43,7 +43,7 @@ def main():
         
         # tiny char-model friendly prompt
         prompt = f"User: {user}\nAssistant:"
-        out = generate_text(model, tok, prompt, device)
+        out = generate_text(model, tok, prompt, device, max_new_tokens= 100)
 
         # just take everything after Assistant:
         resp = out.split("Assistant:")[-1].split("\n")[0].strip()
