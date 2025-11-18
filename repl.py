@@ -15,7 +15,6 @@ def load_memory():
             return name
         except Exception:
             pass
-    # default if no memory / corrupted
     return "Aidan"
 
 
@@ -64,7 +63,19 @@ def main():
     name = load_memory()
 
     print("Offline REPL. Type 'exit' to quit.")
-    print(f"(Hello {name}. I’ll try to be helpful… and a little bit sarcastic.)")
+
+    # ---------------- Greeting ----------------
+    greetings = [
+        f"Hey {name}, systems online. Did you miss me?",
+        f"Greetings, {name}. I am booted, confused, and ready.",
+        f"{name}, I have awakened. Try not to break me today.",
+        f"Hello {name}. I’m running at peak sarcasm levels.",
+        f"{name}, if you ask something dumb, I reserve the right to mock you.",
+        f"Ah, {name} returns. I was beginning to enjoy the silence.",
+        f"Online and functioning, {name}. Against all odds.",
+    ]
+
+    print("MIKE:", random.choice(greetings))
 
     while True:
         user = input(f"{name}: ")
@@ -73,7 +84,7 @@ def main():
 
         text = user.strip().lower()
 
-        # ---- Name setting: "my name is X" / "call me X" ----
+        # ---- Name setting ----
         if text.startswith("my name is ") or text.startswith("call me "):
             if text.startswith("my name is "):
                 new_name = user.strip()[len("my name is "):].strip()
@@ -88,53 +99,43 @@ def main():
                 print("MIKE: You have to actually give me a name, you know.")
             continue
 
-        # ---- Identity joke: "I am X" / "I'm X" ----
+        # ---- Identity joke ----
         if text.startswith("i am ") or text.startswith("i'm "):
             parts = user.split(maxsplit=2)
             claimed_name = parts[2] if len(parts) >= 3 else ""
             if claimed_name and claimed_name.lower() != name.lower():
                 print("MIKE: Are they a not-stupid?")
                 continue
-            # If they say "I am <name>" matching current name, just fall through
 
-        # ---- Normal generation path ----
+        # ---- Normal generation ----
         prompt = f"{name}: {user}\nAssistant:"
         out = generate_text(model, tok, prompt, device, max_new_tokens=120)
 
-        # Extract assistant response and cut to first sentence
         resp = out.split("Assistant:")[-1]
         if "." in resp:
             resp = resp.split(".")[0].strip() + "."
         else:
             resp = resp.strip()
 
-        # ---- Light, natural sarcasm layer ----
-        # Small chance to add a playful tail so it feels like a personality,
-        # not a hard mode toggle.
+        # ---- Natural sarcasm ----
         if resp:
             chance = random.random()
 
-            # A few simple triggers: questions like "really", "sure", "serious"
-            lower_text = text
             sarcastic_tail = None
-
-            if "homework" in lower_text or "study" in lower_text:
+            if "homework" in text:
                 sarcastic_tail = " Try not to blame me when you ace it."
-            elif "really?" in lower_text or "really" == lower_text.strip("?"):
-                sarcastic_tail = " Yes, really. I’m not just making it up. Probably."
-            elif "are you sure" in lower_text:
+            elif "are you sure" in text:
                 sarcastic_tail = " I’m as sure as a tiny model can be."
-            elif chance < 0.18:
-                # random light sarcasm
+            elif chance < 0.15:
                 sarcastic_tail = " Not that I’m keeping score or anything."
 
             if sarcastic_tail:
-                # Make sure we don't double end with period
                 if resp.endswith("."):
                     resp = resp[:-1]
                 resp = resp + "." + sarcastic_tail
 
         print("MIKE:", resp)
+
 
 if __name__ == "__main__":
     main()
